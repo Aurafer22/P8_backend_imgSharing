@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const { Image } = require('../api/models/images')
 const { User } = require('../api/models/users')
 const { verifyToken } = require('../utils/token')
 
@@ -22,17 +22,28 @@ const isAuth = async (req, res, next) => {
 }
 
 const isOwner = async (req, res, next) => {
+  const user = req.user
+  console.log(user)
+  const paramId = req.params.id
+  console.log(`paramID: ${paramId}`)
+
+  const userId = user._id
+  console.log(`userId: ${userId}`)
+
+  // const userIdToString = userId.toString()
+  // console.log(`userIDString: ${userIdToString}`)
+
   try {
-    const user = req.user
-    const paramId = req.params.id
-    const userId = user._id
-    const userIdToString = userId.toString()
-    const imageId = user.images
-    const imageToString = imageId.toString()
-    if (paramId === userIdToString || imageToString.includes(paramId)) {
+    const image = await Image.findById(paramId)
+    const userImage = image.user
+    console.log(`userImage: ${userImage}`)
+    if (paramId === userId || userImage === userId) {
+      console.log(userId === paramId)
       req.user = user
       next()
     } else {
+      console.log(userId === userImage)
+
       return res.status(401).json('Acceso NO autorizado')
     }
   } catch (error) {
@@ -42,3 +53,13 @@ const isOwner = async (req, res, next) => {
 }
 
 module.exports = { isAuth, isOwner }
+
+// const imageId = user.images
+// const imageToString = imageId.toString()
+// if (paramId === userIdToString || imageToString.includes(paramId)) {
+//   req.user = user
+//   next()
+// } else {
+//   console.log(req.params.id.user)
+//   return res.status(401).json('Acceso NO autorizado')
+// }

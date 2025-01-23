@@ -5,7 +5,6 @@ const {
   getUsers,
   deleteUser,
   updateUser,
-  imgByUser,
   getUser
 } = require('../controllers/users')
 const { uploadUsers } = require('../../middlewares/file')

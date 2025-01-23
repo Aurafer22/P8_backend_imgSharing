@@ -4,7 +4,6 @@ const { deleteImgCloud } = require('../../utils/deleteImage')
 const getImages = async (req, res) => {
   try {
     const images = await Image.find()
-    console.log(images.user)
     return res.status(200).json(images)
   } catch (error) {
     console.log(`Error al obtener las imágenes: ${error}`)
@@ -19,7 +18,6 @@ const imgByCategory = async (req, res) => {
     return res.status(200).json(images)
   } catch (error) {
     console.log(`Error al obtener la categoría: ${error}`)
-
     return res.status(500).json(`Error al obtener las imágenes por categoría`)
   }
 }
@@ -30,13 +28,12 @@ const imgByUser = async (req, res) => {
     return res.status(200).json(images)
   } catch (error) {
     console.log(`Error al obtener la categoría: ${error}`)
-
     return res.status(500).json(`Error al obtener las imágenes por categoría`)
   }
 }
-// subir una o varias imágenes a la plataforma
+// subir una imagen a la plataforma
 const postImage = async (req, res) => {
-  const { image, user, category } = req.body
+  const { category } = req.body
   try {
     const newImage = new Image({
       image: req.file ? req.file.path : null,
@@ -47,7 +44,9 @@ const postImage = async (req, res) => {
     return res.status(201).json(savedImage)
   } catch (error) {
     console.log(`Error al crear la imagen: ${error}`)
-    deleteImgCloud(req.file.path)
+    if (req.file) {
+      deleteImgCloud(req.file.path)
+    }
     return res.status(500).json(`Error al crear la imagen`)
   }
 }
@@ -56,9 +55,12 @@ const updateImage = async (req, res) => {
   try {
     const { id } = req.params
     if (!id) {
-      return res.status(404).json('Imagen no econtrada')
+      return res.status(404).json('Indique ID de imagen')
     }
     const actualImage = await Image.findById(id)
+    if (!actualImage) {
+      return res.status(404).json('Imagen NO encontrada')
+    }
     const oldPath = actualImage.image
     const { category } = req.body
     if (req.file && oldPath !== req.file.path) {
@@ -76,7 +78,9 @@ const updateImage = async (req, res) => {
     return res.status(200).json(imageUpdated)
   } catch (error) {
     console.log(`Error al actualizar la imagen: ${error}`)
-    deleteImgCloud(req.file.path)
+    if (req.file) {
+      deleteImgCloud(req.file.path)
+    }
     return res.status(500).json(`Error al actualizar la imagen`)
   }
 }

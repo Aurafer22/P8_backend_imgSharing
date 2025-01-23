@@ -21,7 +21,7 @@ mongoose
       user.password = hashPassword
     }
     await User.insertMany(users)
-    console.log('Semilla creada conrrectamente')
+    console.log('Semilla creada correctamente')
   })
   .catch((error) => {
     console.log(`Error al crear la semilla: ${error}`)
