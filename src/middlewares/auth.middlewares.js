@@ -23,27 +23,19 @@ const isAuth = async (req, res, next) => {
 
 const isOwner = async (req, res, next) => {
   const user = req.user
-  console.log(user)
   const paramId = req.params.id
-  console.log(`paramID: ${paramId}`)
-
   const userId = user._id
-  console.log(`userId: ${userId}`)
-
-  // const userIdToString = userId.toString()
-  // console.log(`userIDString: ${userIdToString}`)
-
+  const userIdToString = userId.toString()
   try {
     const image = await Image.findById(paramId)
-    const userImage = image.user
-    console.log(`userImage: ${userImage}`)
-    if (paramId === userId || userImage === userId) {
-      console.log(userId === paramId)
+    let userImage
+    if (image) {
+      userImage = image.user.toString()
+    }
+    if (paramId === userIdToString || userImage === userIdToString) {
       req.user = user
       next()
     } else {
-      console.log(userId === userImage)
-
       return res.status(401).json('Acceso NO autorizado')
     }
   } catch (error) {
@@ -53,13 +45,3 @@ const isOwner = async (req, res, next) => {
 }
 
 module.exports = { isAuth, isOwner }
-
-// const imageId = user.images
-// const imageToString = imageId.toString()
-// if (paramId === userIdToString || imageToString.includes(paramId)) {
-//   req.user = user
-//   next()
-// } else {
-//   console.log(req.params.id.user)
-//   return res.status(401).json('Acceso NO autorizado')
-// }
